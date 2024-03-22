@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -11,8 +11,8 @@ dependencies:
 
 devDependencies:
   '@fhenixprotocol/contracts':
-    specifier: ^0.1.0-beta.3
-    version: 0.1.0-beta.3
+    specifier: ^0.1.1
+    version: 0.1.1
   '@nomicfoundation/hardhat-chai-matchers':
     specifier: ^2.0.6
     version: 2.0.6(@nomicfoundation/hardhat-ethers@3.0.5)(chai@4.4.1)(ethers@6.11.1)(hardhat@2.20.1)
@@ -445,8 +445,8 @@ packages:
     engines: {node: '>=14'}
     dev: true
 
-  /@fhenixprotocol/contracts@0.1.0-beta.3:
-    resolution: {integrity: sha512-d7gFgTPX++VfMs450CM1gR0tCRhs7FyWU1tgf3i+wJWwLmtjMM+6pKM67+xHoRbMq7TuGRzAEZEurk3rpIfkJg==}
+  /@fhenixprotocol/contracts@0.1.1:
+    resolution: {integrity: sha512-Pj5J8Pp/ZiOJNkRCLq3AU/M1CnUCVvhJnckde7lHuiihtw1FobCX/FVwfpGjxthIrb6d25CNIXhlOEZ6StS2tQ==}
     dependencies:
       '@openzeppelin/contracts': 5.0.1
     dev: true

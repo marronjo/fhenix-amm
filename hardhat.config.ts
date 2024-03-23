@@ -50,6 +50,9 @@ const config: HardhatUserConfig = {
     outDir: "types",
     target: "ethers-v6",
   },
+  mocha: {
+    timeout: 100000000
+  },
 };
 
 export default config;

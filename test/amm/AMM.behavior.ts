@@ -4,7 +4,23 @@ import hre from "hardhat";
 export function shouldBehaveLikeAMM(): void {
   it("should allow user to add liquidity", async function () {
 
-    console.log("should allow user to add liquidity");
+    const supplyAmount = 100;
+
+    const esupplyAmount = await this.ammInstance.instance.encrypt_uint32(
+      supplyAmount,
+    );
+
+    const ePoolShares = await this.amm.connect(this.signers.admin).addLiquidity(esupplyAmount, esupplyAmount, this.ammInstance.permission);
+
+    //console.log(ePoolShares[0].toString(), ePoolShares[1].toString());
+
+    const poolShares = this.ammInstance.instance.unseal(
+      await this.amm.getAddress(),
+      ePoolShares
+    );
+
+    console.log("liquidity0or1Zero", Boolean(poolShares));
+
     // const amountToWrap = 100;
 
     // const adminBalanceBefore = await this.etoken.balanceOf(this.signers.admin.address);
@@ -23,5 +39,5 @@ export function shouldBehaveLikeAMM(): void {
 
     // expect(Number(encryptedTokensBalance) === amountToWrap);
     // expect(Number(adminBalanceAfter) === Number(adminBalanceBefore) - amountToWrap);
-  });
+  }).timeout(100000);
 }

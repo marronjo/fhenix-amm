@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.13 <0.9.0;
 
+import {Permissioned, Permission} from "@fhenixprotocol/contracts/access/Permissioned.sol";
 import { IFHERC20 } from "@fhenixprotocol/contracts/experimental/token/FHERC20/IFHERC20.sol";
-import { FHE, inEuint32, euint32, inEbool, ebool } from "@fhenixprotocol/contracts/FHE.sol";
+import { FHE, inEuint32, euint32, inEuint8, euint8, inEbool, ebool } from "@fhenixprotocol/contracts/FHE.sol";
 
-contract AMM {
+contract AMM is Permissioned {
 
     IFHERC20 public immutable i_token0;
     IFHERC20 public immutable i_token1;
@@ -71,38 +72,44 @@ contract AMM {
     //max amount of each side user is willing to deposit
     //pool with calculate the optimal amount of each token to deposit based on 'xy = k' formula
     function addLiquidity(
-        euint32 maxAmount0,
-        euint32 maxAmount1
-    ) external returns (euint32 poolShares) {
+        inEuint8 calldata maxAmountIn0,
+        inEuint8 calldata maxAmountIn1,
+        Permission calldata permission
+    ) external view returns (bytes memory){
 
-        euint32 optAmount0;
-        euint32 optAmount1;
+        euint8 maxAmount0 = FHE.asEuint8(maxAmountIn0);
+        euint8 maxAmount1 = FHE.asEuint8(maxAmountIn1);
+
+        euint8 optAmount0;
+        euint8 optAmount1;
 
         ebool liquidity0Zero = FHE.eq(s_liquidity0, ZERO);
         ebool liquidity1Zero = FHE.eq(s_liquidity1, ZERO);
 
         ebool liquidity0or1Zero = FHE.or(liquidity0Zero, liquidity1Zero);
 
-        (euint32 tempOptAmount0, euint32 tempOptAmount1) = calculateCPLiquidityReq(
-            maxAmount0,
-            maxAmount1
-        );
+        return FHE.sealoutput(liquidity0or1Zero, permission.publicKey);
 
-        optAmount0 = FHE.select(liquidity0or1Zero, maxAmount0, tempOptAmount0); 
-        optAmount1 = FHE.select(liquidity0or1Zero, maxAmount1, tempOptAmount1); 
+        // (euint32 tempOptAmount0, euint32 tempOptAmount1) = calculateCPLiquidityReq(
+        //     maxAmount0,
+        //     maxAmount1
+        // );
 
-        i_token0.transferFromEncrypted(msg.sender, address(this), optAmount0);
-        i_token1.transferFromEncrypted(msg.sender, address(this), optAmount1);
+        // optAmount0 = FHE.select(liquidity0or1Zero, maxAmount0, tempOptAmount0); 
+        // optAmount1 = FHE.select(liquidity0or1Zero, maxAmount1, tempOptAmount1); 
 
-        ebool totalSharesZero = FHE.eq(s_totalShares, ZERO);
+        // i_token0.transferFromEncrypted(msg.sender, address(this), optAmount0);
+        // i_token1.transferFromEncrypted(msg.sender, address(this), optAmount1);
 
-        poolShares = FHE.select(totalSharesZero, _sqrt(optAmount0 * optAmount1), calculateTotalSharesNonZeroLiquidity(optAmount0, optAmount1));
+        // ebool totalSharesZero = FHE.eq(s_totalShares, ZERO);
 
-        s_liquidity0 = s_liquidity0 + optAmount0;
-        s_liquidity1 = s_liquidity1 + optAmount1;
+        // poolShares = FHE.select(totalSharesZero, _sqrt(optAmount0 * optAmount1), calculateTotalSharesNonZeroLiquidity(optAmount0, optAmount1));
 
-        s_totalShares = s_totalShares + poolShares;
-        s_userLiquidityShares[msg.sender] = s_userLiquidityShares[msg.sender] + poolShares;
+        // s_liquidity0 = s_liquidity0 + optAmount0;
+        // s_liquidity1 = s_liquidity1 + optAmount1;
+
+        // s_totalShares = s_totalShares + poolShares;
+        // s_userLiquidityShares[msg.sender] = s_userLiquidityShares[msg.sender] + poolShares;
     }
 
     function withdrawLiquidity(

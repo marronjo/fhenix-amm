@@ -2,37 +2,24 @@ import { expect } from "chai";
 import hre from "hardhat";
 
 export function shouldBehaveLikeCounter(): void {
-  it("should transfer encrypted amount successfully to receiver", async function () {
-    const amountToTransfer = 100;
+  it("should wrap tokens to equivalent encrypted amount", async function () {
+    const amountToWrap = 100;
 
-    const eAmountToTransfer = await this.instance.instance.encrypt_uint32(
-      amountToTransfer,
+    const adminBalanceBefore = await this.etoken.balanceOf(this.signers.admin.address);
+
+    //should burn 100 unencrypted tokens and wrap them to encrypted tokens
+    await this.etoken.connect(this.signers.admin).wrap(amountToWrap);
+
+    const eBalance = await this.etoken.balanceOfEncrypted(this.signers.admin.address, this.instance.permission);
+
+    const encryptedTokensBalance = this.instance.instance.unseal(
+      await this.etoken.getAddress(),
+      eBalance,
     );
-    const eAmountSent = await this.etoken.connect(this.signers.admin)["transferEncrypted(address,(bytes))"](this.signers.user1.address, eAmountToTransfer);
 
-    // const amountSent = this.instance.instance.unseal(
-    //   await this.etoken.getAddress(),
-    //   eAmountSent,
-    // );
+    const adminBalanceAfter = await this.etoken.balanceOf(this.signers.admin.address);
 
-    // console.log(amountSent);
-
-    const balanceAdmin = await this.etoken
-    .connect(this.signers.admin)
-    .balanceOf(this.signers.admin.address);
-
-    // const balanceAdmin = this.instance.instance.unseal(
-    //   await this.etoken.getAddress(),
-    //   eBalanceAdmin,
-    // );
-
-    console.log(`Admin Balance : ${balanceAdmin}`);
-
-    // const amount = this.instance.instance.unseal(
-    //   await this.counter.getAddress(),
-    //   eAmount,
-    // );
-
-    //expect(Number(amount) === amountToCount);
+    expect(Number(encryptedTokensBalance) === amountToWrap);
+    expect(Number(adminBalanceAfter) === Number(adminBalanceBefore) - amountToWrap);
   });
 }

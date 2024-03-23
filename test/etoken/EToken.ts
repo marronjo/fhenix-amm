@@ -12,11 +12,11 @@ describe("Unit tests", function () {
     // get tokens for first 2 accounts by default
     await getTokensFromFaucet();
     // deploy test contract
-    const { etoken, address } = await deployETokenFixture();
+    const { etoken, etokenAddress } = await deployETokenFixture();
     this.etoken = etoken;
 
     // initiate fhenixjs
-    this.instance = await createFheInstance(hre, address);
+    this.instance = await createFheInstance(hre, etokenAddress);
 
     // set admin account/signer
     const signers = await hre.ethers.getSigners();

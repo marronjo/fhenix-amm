@@ -4,7 +4,7 @@ import hre from "hardhat";
 
 export async function deployETokenFixture(): Promise<{
   etoken: EToken;
-  address: string;
+  etokenAddress: string;
 }> {
   const accounts = await hre.ethers.getSigners();
   const contractOwner = accounts[0];
@@ -13,9 +13,33 @@ export async function deployETokenFixture(): Promise<{
   const etoken = await EToken.connect(contractOwner).deploy("EToken", "ETK");
 
   await etoken.waitForDeployment();
-  const address = await etoken.getAddress();
+  const etokenAddress = await etoken.getAddress();
 
-  return { etoken, address };
+  return { etoken, etokenAddress };
+}
+
+export async function deployTwoETokenFixture(): Promise<{
+  etoken0: EToken;
+  etokenAddress0: string;
+  etoken1: EToken;
+  etokenAddress1: string;
+}> {
+  const accounts = await hre.ethers.getSigners();
+  const contractOwner = accounts[0];
+
+  const EToken0 = await hre.ethers.getContractFactory("EToken");
+  const etoken0 = await EToken0.connect(contractOwner).deploy("EToken0", "ETK0");
+
+  await etoken0.waitForDeployment();
+  const etokenAddress0 = await etoken0.getAddress();
+
+  const EToken1 = await hre.ethers.getContractFactory("EToken");
+  const etoken1 = await EToken1.connect(contractOwner).deploy("EToken1", "ETK1");
+
+  await etoken1.waitForDeployment();
+  const etokenAddress1 = await etoken1.getAddress();
+
+  return { etoken0, etokenAddress0, etoken1, etokenAddress1 };
 }
 
 export async function getTokensFromFaucet(numSigners: number = 2) {

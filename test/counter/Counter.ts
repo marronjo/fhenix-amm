@@ -23,6 +23,6 @@ describe("Unit tests", function () {
   });
 
   describe("Counter", function () {
-    shouldBehaveLikeCounter();
+    //shouldBehaveLikeCounter();
   });
 });

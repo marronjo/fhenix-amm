@@ -96,7 +96,8 @@ contract AMM is Permissioned {
         i_token0.transferFromEncrypted(msg.sender, address(this), FHE.asEuint32(optAmount0));
 
         optAmount1 = FHE.select(liquidity0or1Zero, maxAmount1, tempOptAmount1); 
-        //i_token1.transferFromEncrypted(msg.sender, address(this), FHE.asEuint32(optAmount1)); //throws nonce error!
+        //TODO - fix nonce error
+        i_token1.transferFromEncrypted(msg.sender, address(this), FHE.asEuint32(optAmount1)); //throws nonce error!
 
         //ebool totalSharesZero = FHE.eq(s_totalShares, ZERO);
 
@@ -107,6 +108,24 @@ contract AMM is Permissioned {
 
         //s_totalShares = s_totalShares + poolShares;
         //s_userLiquidityShares[msg.sender] = s_userLiquidityShares[msg.sender] + poolShares;
+    }
+
+    // just used for testing, does not follow constant product formula
+    // 2 transfers in single function call results in nonce error locally!
+    // add 1 token at a time for now, with no checks
+    function addSingleTokenLiquidity(
+        bool addZero,                   //true ? add token0 : add token1 ... unencrypted for now
+        inEuint8 calldata amountIn
+    ) external {    
+        euint8 tokenAmountIn = FHE.asEuint8(amountIn);
+
+        if(addZero){
+            i_token0.transferFromEncrypted(msg.sender, address(this), FHE.asEuint32(tokenAmountIn));
+            s_liquidity0 = s_liquidity0 + tokenAmountIn;
+        }else {
+            i_token1.transferFromEncrypted(msg.sender, address(this), FHE.asEuint32(tokenAmountIn));
+            s_liquidity1 = s_liquidity1 + tokenAmountIn;
+        }
     }
 
     // function withdrawLiquidity(

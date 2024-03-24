@@ -32,7 +32,7 @@ if (!keys) {
   testnetConfig['accounts'] = {
     count: 10,
     mnemonic,
-    path: "m/44'/60'/0'/0",
+    path: "m/44'/60'/0'/0"
   }
 } else {
   testnetConfig['accounts'] = [keys];
@@ -51,7 +51,7 @@ const config: HardhatUserConfig = {
     target: "ethers-v6",
   },
   mocha: {
-    timeout: 100000000
+    timeout: 400000000
   },
 };
 

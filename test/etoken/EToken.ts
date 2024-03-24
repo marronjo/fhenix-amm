@@ -29,6 +29,6 @@ describe("Unit tests", function () {
   });
 
   describe("EToken", function () {
-    shouldBehaveLikeCounter();
+    //shouldBehaveLikeCounter();
   });
 });

@@ -56,6 +56,6 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "fhenixjs": "^0.1.0-beta.6"
+    "fhenixjs": "^0.1.1"
   }
 }

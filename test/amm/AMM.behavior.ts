@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import { EncryptionTypes } from "fhenixjs";
 import hre from "hardhat";
 
 export function shouldBehaveLikeAMM(): void {
@@ -27,7 +28,7 @@ export function shouldBehaveLikeAMM(): void {
 
     expect(Number(adminBalanceToken0Before) - supplyAmount).to.equal(Number(adminBalanceToken0After));
   });
-  
+
   it("should allow user to add token1 liquidity", async function () {
     const supplyAmount = 5;
 
@@ -52,5 +53,18 @@ export function shouldBehaveLikeAMM(): void {
     );
 
     expect(Number(adminBalanceToken1Before) - supplyAmount).to.equal(Number(adminBalanceToken1After));
+  });
+
+  it("should allow user to perform swap", async function () {
+    const supplyAmount = 5;
+
+    const esupplyAmount = await this.ammInstance.instance.encrypt_uint8(
+      supplyAmount
+    );
+
+    //how to encrypt ebool ?
+    //const eZeroForOne = await this.ammInstance.instance.encrypt(0);
+
+    //await this.amm.connect(this.signers.admin).swap(eZeroForOne, esupplyAmount);
   });
 }

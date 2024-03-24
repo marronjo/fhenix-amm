@@ -24,6 +24,7 @@ describe("Unit tests", function () {
     // deploy test contract
     const { amm, ammAddress } = await deployAMMFixture(etokenAddress0, etokenAddress1);
     this.amm = amm;
+    this.ammAddress = ammAddress;
 
     // initiate fhenixjs with amm
     this.ammInstance = await createFheInstance(hre, ammAddress);

@@ -73,9 +73,8 @@ contract AMM is Permissioned {
     //pool with calculate the optimal amount of each token to deposit based on 'xy = k' formula
     function addLiquidity(
         inEuint8 calldata maxAmountIn0,
-        inEuint8 calldata maxAmountIn1,
-        Permission calldata permission
-    ) external view returns (bytes memory, bytes memory){
+        inEuint8 calldata maxAmountIn1    
+    ) external {
 
         euint8 maxAmount0 = FHE.asEuint8(maxAmountIn0);
         euint8 maxAmount1 = FHE.asEuint8(maxAmountIn1);
@@ -94,25 +93,20 @@ contract AMM is Permissioned {
         );
 
         optAmount0 = FHE.select(liquidity0or1Zero, maxAmount0, tempOptAmount0); 
+        i_token0.transferFromEncrypted(msg.sender, address(this), FHE.asEuint32(optAmount0));
+
         optAmount1 = FHE.select(liquidity0or1Zero, maxAmount1, tempOptAmount1); 
+        //i_token1.transferFromEncrypted(msg.sender, address(this), FHE.asEuint32(optAmount1)); //throws nonce error!
 
-        //i_token0.transferFromEncrypted(msg.sender, address(this), FHE.asEuint32(optAmount0));
-        //i_token1.transferFromEncrypted(msg.sender, address(this), FHE.asEuint32(optAmount1));
+        //ebool totalSharesZero = FHE.eq(s_totalShares, ZERO);
 
-        return (
-            FHE.sealoutput(optAmount0, permission.publicKey),
-            FHE.sealoutput(optAmount1, permission.publicKey)
-        );
+        //euint8 poolShares = FHE.select(totalSharesZero, _sqrt(optAmount0 * optAmount1), calculateTotalSharesNonZeroLiquidity(optAmount0, optAmount1));
 
-        // ebool totalSharesZero = FHE.eq(s_totalShares, ZERO);
+        s_liquidity0 = s_liquidity0 + optAmount0;
+        s_liquidity1 = s_liquidity1 + optAmount1;
 
-        // poolShares = FHE.select(totalSharesZero, _sqrt(optAmount0 * optAmount1), calculateTotalSharesNonZeroLiquidity(optAmount0, optAmount1));
-
-        // s_liquidity0 = s_liquidity0 + optAmount0;
-        // s_liquidity1 = s_liquidity1 + optAmount1;
-
-        // s_totalShares = s_totalShares + poolShares;
-        // s_userLiquidityShares[msg.sender] = s_userLiquidityShares[msg.sender] + poolShares;
+        //s_totalShares = s_totalShares + poolShares;
+        //s_userLiquidityShares[msg.sender] = s_userLiquidityShares[msg.sender] + poolShares;
     }
 
     // function withdrawLiquidity(

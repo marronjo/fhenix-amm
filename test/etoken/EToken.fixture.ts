@@ -1,4 +1,4 @@
-import type { Counter, EToken } from "../../types";
+import type { Counter, EToken, MyFHERC20 } from "../../types";
 import axios from "axios";
 import hre from "hardhat";
 
@@ -19,21 +19,21 @@ export async function deployETokenFixture(): Promise<{
 }
 
 export async function deployTwoETokenFixture(): Promise<{
-  etoken0: EToken;
+  etoken0: MyFHERC20;
   etokenAddress0: string;
-  etoken1: EToken;
+  etoken1: MyFHERC20;
   etokenAddress1: string;
 }> {
   const accounts = await hre.ethers.getSigners();
   const contractOwner = accounts[0];
 
-  const EToken0 = await hre.ethers.getContractFactory("EToken");
+  const EToken0 = await hre.ethers.getContractFactory("MyFHERC20");
   const etoken0 = await EToken0.connect(contractOwner).deploy("EToken0", "ETK0");
 
   await etoken0.waitForDeployment();
   const etokenAddress0 = await etoken0.getAddress();
 
-  const EToken1 = await hre.ethers.getContractFactory("EToken");
+  const EToken1 = await hre.ethers.getContractFactory("MyFHERC20");
   const etoken1 = await EToken1.connect(contractOwner).deploy("EToken1", "ETK1");
 
   await etoken1.waitForDeployment();

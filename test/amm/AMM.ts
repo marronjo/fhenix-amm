@@ -34,23 +34,23 @@ describe("Unit tests", function () {
     this.signers.admin = signers[0];
     this.signers.user1 = signers[1];
 
-    const eAmount = await this.ammInstance.instance.encrypt_uint32(
-      1_000_000,
+    const eAmount = await this.ammInstance.instance.encrypt_uint8(
+      100,
     );
 
     // mint, wrap and approve '1M' token0 to 2 users for tests
-    await this.etoken0.connect(this.signers.admin).mint(this.signers.admin.address, 1_000_000);  
-    await this.etoken0.connect(this.signers.user1).mint(this.signers.user1.address, 1_000_000);  
-    await this.etoken0.connect(this.signers.admin).wrap(1_000_000);
-    await this.etoken0.connect(this.signers.user1).wrap(1_000_000);
+    await this.etoken0.connect(this.signers.admin).mint(this.signers.admin.address, 100);  
+    await this.etoken0.connect(this.signers.user1).mint(this.signers.user1.address, 100);  
+    await this.etoken0.connect(this.signers.admin).wrap(100);
+    await this.etoken0.connect(this.signers.user1).wrap(100);
     await this.etoken0.connect(this.signers.admin).approveEncrypted(ammAddress, eAmount);
     await this.etoken0.connect(this.signers.user1).approveEncrypted(ammAddress, eAmount);
 
     // mint, wrap and approve '1M' token1 to 2 users for tests
-    await this.etoken1.connect(this.signers.admin).mint(this.signers.admin.address, 1_000_000);  
-    await this.etoken1.connect(this.signers.user1).mint(this.signers.user1.address, 1_000_000);  
-    await this.etoken1.connect(this.signers.admin).wrap(1_000_000);
-    await this.etoken1.connect(this.signers.user1).wrap(1_000_000);
+    await this.etoken1.connect(this.signers.admin).mint(this.signers.admin.address, 100);  
+    await this.etoken1.connect(this.signers.user1).mint(this.signers.user1.address, 100);  
+    await this.etoken1.connect(this.signers.admin).wrap(100);
+    await this.etoken1.connect(this.signers.user1).wrap(100);
     await this.etoken1.connect(this.signers.admin).approveEncrypted(ammAddress, eAmount);
     await this.etoken1.connect(this.signers.user1).approveEncrypted(ammAddress, eAmount);
   });

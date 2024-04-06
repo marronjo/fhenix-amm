@@ -17,25 +17,23 @@ contract AMM is Permissioned {
     euint8 public s_liquidity1;
 
     //constants used throughout contract
-    euint8 private immutable ZERO;
-    euint8 private immutable ONE;
-    euint8 private immutable TWO;
-    euint8 private immutable THREE;
+    euint8 private immutable ZERO = FHE.asEuint8(0);
+    euint8 private immutable ONE = FHE.asEuint8(1);
+    euint8 private immutable TWO = FHE.asEuint8(2);
+    euint8 private immutable THREE = FHE.asEuint8(3);
 
     constructor(address tokenAddress0, address tokenAddress1) {
         i_token0 = IFHERC20(tokenAddress0);
         i_token1 = IFHERC20(tokenAddress1);
-
-        ZERO = FHE.asEuint8(0);
-        ONE = FHE.asEuint8(1);
-        TWO = FHE.asEuint8(2);
-        THREE = FHE.asEuint8(3);
     }
 
     function swap(
-        ebool zeroForOne, 
-        euint8 sellAmount
+        bool zeroForOneIn,   //not sure how to encrypt calldata ebool yet, using regular bool for now
+        inEuint8 calldata sellAmountIn
     ) external {
+        ebool zeroForOne = FHE.asEbool(zeroForOneIn);
+        euint8 sellAmount = FHE.asEuint8(sellAmountIn);
+
         //even if token0 is not being deposited, transfer 0 tokens to contract to obscure the trade direction
         euint8 token0Amount = FHE.select(zeroForOne, sellAmount, ZERO); //bad practice to use 'ZERO' in multiple places without re-encrypting?
         euint8 token1Amount = FHE.select(zeroForOne, ZERO, sellAmount);
@@ -62,8 +60,6 @@ contract AMM is Permissioned {
         //even if 0 tokens are withdrawm, still update balance by 0 to obscure trade direction
         i_token0.transferEncrypted(msg.sender, token1Amount);
         i_token1.transferEncrypted(msg.sender, token0Amount);
-
-        //return FHE.asEuint8(FHE.sealoutput(amountOut, permission.publicKey));
     }
     
     //max amount of each side user is willing to deposit
@@ -103,24 +99,6 @@ contract AMM is Permissioned {
 
         s_totalShares = s_totalShares + poolShares;
         s_userLiquidityShares[msg.sender] = s_userLiquidityShares[msg.sender] + poolShares;
-    }
-
-    // just used for testing, does not follow constant product formula
-    // 2 transfers in single function call results in nonce error / timeout locally!
-    // add 1 token at a time for now, with no checks
-    function addSingleTokenLiquidity(
-        bool addZero,                   //true ? add token0 : add token1 ... unencrypted for now
-        inEuint8 calldata amountIn
-    ) external {    
-        euint8 tokenAmountIn = FHE.asEuint8(amountIn);
-
-        if(addZero){
-            i_token0.transferFromEncrypted(msg.sender, address(this), tokenAmountIn);
-            s_liquidity0 = s_liquidity0 + tokenAmountIn;
-        }else {
-            i_token1.transferFromEncrypted(msg.sender, address(this), tokenAmountIn);
-            s_liquidity1 = s_liquidity1 + tokenAmountIn;
-        }
     }
 
     // function withdrawLiquidity(
@@ -181,7 +159,6 @@ contract AMM is Permissioned {
         poolShares = FHE.select(shares0ltShares1, shares0, shares1);
     }
 
-    // less FHE operations than original method
     function _sqrt(euint8 ye) private pure returns(euint8){
         uint8 y = FHE.decrypt(ye);
         uint8 z;
@@ -197,22 +174,4 @@ contract AMM is Permissioned {
         }
         return FHE.asEuint8(z);
     }
-
-    // function _sqrt(euint8 y) private view returns (euint8 z) {
-    //     ebool ygt3 = FHE.gt(y, THREE);
-    //     ebool yne0 = FHE.ne(y, ZERO);
-
-    //     euint8 yDefault = FHE.select(yne0, ONE, ZERO);
-
-    //     z = FHE.select(ygt3, _calculateSqrt(y), yDefault);
-    // }
-
-    // function _calculateSqrt(euint8 y) private view returns(euint8 z) {
-    //     z = y;
-    //     euint8 x = y / TWO + ONE;
-    //     while (FHE.decrypt(FHE.lt(x,z))) {  // only called on first add liquidity, does not reveal sensitive info
-    //         z = x;
-    //         x = (y / x + x) / TWO;
-    //     }
-    // }
 }

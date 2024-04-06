@@ -15,7 +15,6 @@ export function shouldBehaveLikeAMM(): void {
       const eAdminBalanceToken0Before = await this.etoken0.balanceOfEncrypted(this.signers.admin.address, this.etoken0Instance.permission);
       const eAdminBalanceToken1Before = await this.etoken1.balanceOfEncrypted(this.signers.admin.address, this.etoken1Instance.permission);
 
-
       const adminBalanceToken0Before = this.etoken0Instance.instance.unseal(
         await this.etoken0.getAddress(),
         eAdminBalanceToken0Before,

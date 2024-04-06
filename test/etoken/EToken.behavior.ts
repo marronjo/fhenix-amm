@@ -2,7 +2,7 @@ import { expect } from "chai";
 import hre from "hardhat";
 
 export function shouldBehaveLikeCounter(): void {
-  it("should wrap tokens to equivalent encrypted amount", async function () {
+  it("should allow user to encrypt tokens", async function () {
     const amountToWrap = 100;
 
     const adminBalanceBefore = await this.etoken.balanceOf(this.signers.admin.address);

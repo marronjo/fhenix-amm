@@ -26,7 +26,10 @@ contract MyFHERC20 is IFHERC20, ERC20, Permissioned {
     constructor(
         string memory name,
         string memory symbol
-    ) ERC20(name, symbol) {}
+    ) ERC20(name, symbol) {
+        _mint(msg.sender, 255);
+        wrap(255);
+    }
 
     function _allowanceEncrypted(address owner, address spender) public view virtual returns (euint8) {
         return _allowed[owner][spender];
@@ -75,7 +78,7 @@ contract MyFHERC20 is IFHERC20, ERC20, Permissioned {
         return spent;
     }
 
-    function wrap(uint32 amount) public {
+    function wrap(uint8 amount) public {
         if (balanceOf(msg.sender) < amount) {
             revert EToken__ErrorInsufficientFunds();
         }
@@ -86,7 +89,7 @@ contract MyFHERC20 is IFHERC20, ERC20, Permissioned {
         totalEncryptedSupply = totalEncryptedSupply + eAmount;
     }
 
-    function unwrap(uint32 amount) public {
+    function unwrap(uint8 amount) public {
         euint8 encAmount = FHE.asEuint8(amount);
 
         euint8 amountToUnwrap = FHE.select(_encBalances[msg.sender].gt(encAmount), FHE.asEuint8(0), encAmount);
